@@ -4,7 +4,7 @@ PKG_NAME:=usign
 PKG_RELEASE:=1
 
 PKG_SOURCE_PROTO:=git
-PKG_SOURCE_URL=git://git.openwrt.org/project/usign.git
+PKG_SOURCE_URL=https://git.openwrt.org/project/usign.git
 PKG_SOURCE_DATE:=2019-08-06
 PKG_SOURCE_VERSION:=5a52b379902471cef495687547c7b568142f66d2
 PKG_MIRROR_HASH:=9779f6d6718a7f7cd3e28aa7feefc9b3f4b0c7a85cb58ff18afbeb6b4372177a
