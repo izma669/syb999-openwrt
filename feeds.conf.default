@@ -1,4 +1,4 @@
-src-git packages https://github.com/izma669/syb999-packages-15.05.1.git
+src-git packages https://github.com/izma669/syb999-packages-15.05.1.git;master
 src-git luci https://github.com/syb999/luci-15.05.1.git
 src-git routing https://github.com/syb999/routing-15.05.git
 src-git telephony https://github.com/syb999/telephony-15.05.1.git
