@@ -4,7 +4,7 @@ PKG_NAME:=netifd
 PKG_RELEASE:=1
 
 PKG_SOURCE_PROTO:=git
-PKG_SOURCE_URL:=git://git.openwrt.org/project/netifd.git
+PKG_SOURCE_URL:=https://git.openwrt.org/project/netifd.git
 PKG_SOURCE_DATE:=2021-01-09
 PKG_SOURCE_VERSION:=753c351bc729967a691d99e27693be5aec334028
 PKG_MD5SUM:=182dba0b63834a206db0e6a8b7a8b4aa
