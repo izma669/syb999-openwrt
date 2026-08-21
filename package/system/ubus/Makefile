@@ -4,7 +4,7 @@ PKG_NAME:=ubus
 PKG_RELEASE:=1
 
 PKG_SOURCE_PROTO:=git
-PKG_SOURCE_URL:=git://git.openwrt.org/project/ubus.git
+PKG_SOURCE_URL:=https://git.openwrt.org/project/ubus.git
 PKG_SOURCE_DATE:=2021-07-01
 PKG_SOURCE_VERSION:=38c7fdd8991366cd2f9ccbc47625f9b51b1d318a
 PKG_MD5SUM:=9382def90bb0be4488d4d9fc08b69eb6
