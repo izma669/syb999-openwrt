@@ -127,25 +127,22 @@ o.default = "br-lan"
 o.description = translate("部署在主路由等无 vxlan/br-iptv 环境时, 手动指定抓包接口 (如 br-lan / eth0.2 / br-wan)。接口不存在时自动回退 br-lan→br-wan")
 
 o = s3:option(Value, "broadband_uid", translate("宽带账号 (EPG 认证用)"))
-o.default = ""
 o.placeholder = "adXXXXXXXX 或 XXXX@etv1"
 o:depends("provider", "telecom")
 protect_telecom(o)
-o.description = translate("输入宽带 PPPoE 账号(如 adXXXXXXXX)。系统自动去掉 ad 前缀拼 @etv1 作为 EPG 认证账号; 也可直接填完整账号(如 XXXXXXXX@etv1)。公共版不内置账号, 由机顶盒抓包自动采集; 联通模式无需填写")
+o.description = translate("输入宽带 PPPoE 账号(格式如 adXXXXXXXX)。系统自动去掉 ad 前缀拼 @etv1 作为 EPG 认证账号; 也可直接填完整账号(如 XXXXXXXX@etv1)。留空则走机顶盒抓包自动采集。联通模式自动采集, 无需填写")
 
 o = s3:option(Value, "stb_sn", translate("机顶盒 SN (EPG 认证用)"))
-o.default = ""
 o.placeholder = "机顶盒背面 SN 序列号"
 o:depends("provider", "telecom")
 protect_telecom(o)
-o.description = translate("机顶盒背面标签的 SN 序列号。认证时自动在前面补 0 到 32 位。联通模式自动采集, 无需填写")
+o.description = translate("机顶盒背面标签的 SN 序列号。认证时自动在前面补 0 到 32 位。留空则走机顶盒抓包自动采集。联通模式自动采集, 无需填写")
 
 o = s3:option(Value, "stb_mac", translate("机顶盒 MAC (自动发现/认证用)"))
-o.default = ""
 o.placeholder = "AA:BB:CC:DD:EE:FF"
 o:depends("provider", "telecom")
 protect_telecom(o)
-o.description = translate("换机顶盒后修改为此新机顶盒的 MAC 地址。联通模式自动采集, 无需填写")
+o.description = translate("换机顶盒后修改为此新机顶盒的 MAC 地址。留空则按抓包流量自动发现。联通模式自动采集, 无需填写")
 
 o = s3:option(Value, "getkey_url", translate("私钥下载直链 (可选)"))
 o.default = ""
@@ -155,7 +152,6 @@ protect_telecom(o)
 o.description = translate("账号直登需要 RSA 私钥 (公共版不内置)。填私钥文件的直链 (网盘/自建服务器, 国内可达) 后自动下载; 留空则尝试 GitHub 提取或手动放置 /etc/iptv_epg_rsa.pem。联通模式不需要私钥")
 
 o = s3:option(Value, "stb_ip", translate("机顶盒 IP (可选, 默认按 MAC 自动发现)"))
-o.default = ""
 o.placeholder = "192.168.1.100"
 o:depends("provider", "telecom")
 protect_telecom(o)
