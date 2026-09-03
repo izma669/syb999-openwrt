@@ -65,13 +65,26 @@ echo "[$(date '+%F %T')] UID=$UID SN=$SN MAC=$MAC IP_BIND=$IP_BIND" >> "$LOG"
 #    iptv_epg route 会添加 route_target + route_extra (uci 可配置)
 /usr/bin/iptv_epg route >/dev/null 2>&1 || true
 # ② 认证源 IP (机顶盒绑定 IP 作为 secondary) — 需要知道专网接口
-#    接口选择优先级: network.iptv.ifname -> 有 30.170.x IP 的接口 -> iptv/br-iptv/br-lan
-IPIF=$(uci get network.iptv.ifname 2>/dev/null)
-if [ -z "$IPIF" ] || [ ! -d "/sys/class/net/$IPIF" ]; then
-  IPIF=""
-  for I in $(ip -o addr show 2>/dev/null | awk '$4 ~ /^30\.170\./ {print $2}'); do
-    IPIF="$I"
-    break
+#    接口选择优先级: 🔴 DHCP 活跃(udhcpc pid)优先 → 专网网段 → network.iptv.ifname → iptv/br-iptv/br-lan
+#    (曾优先 ifname=eth0.85: 有历史认证源IP 静态残留 → 认证路由指死网关 → 4kLogAuth 失败!
+#     必须选 DHCP 动态接口 br-iptv, udhcpc 活跃且 30.171.x 可用)
+IPIF=""
+for I in $(uci get network.iptv.ifname 2>/dev/null) br-iptv; do
+  [ -d "/sys/class/net/$I" ] || continue
+  [ -f "/var/run/udhcpc-$I.pid" ] || continue
+  IPIF="$I"; break
+done
+# 全接口: DHCP 活跃 + 专网网段 (30.170.x/30.171.x)
+if [ -z "$IPIF" ]; then
+  for I in $(ip -o addr show 2>/dev/null | awk '$4 ~ /^30\.17[01]\./ {print $2}'); do
+    [ -f "/var/run/udhcpc-$I.pid" ] || continue
+    IPIF="$I"; break
+  done
+fi
+# 兼容: 无 udhcpc 场景, 静态专网网段
+if [ -z "$IPIF" ]; then
+  for I in $(ip -o addr show 2>/dev/null | awk '$4 ~ /^30\.17[01]\./ {print $2}'); do
+    IPIF="$I"; break
   done
 fi
 [ -z "$IPIF" ] && IPIF=iptv

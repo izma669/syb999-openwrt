@@ -54,6 +54,15 @@ o:value("radio0", "radio0 (2.4G)")
 o:value("radio1", "radio1 (5G, requires hardware support)")
 o.rmempty = true
 
+o = s:taboption("backhaul", Value, "channel", translate("Wireless Channel"),
+	translate("Server (AP): fixed 2.4G channel, e.g. 1/6/11 - both server and client STAs must actually be on it; leave empty or 'auto' to let the radio pick. " ..
+		"Client (STA): optional - the STA normally follows the server AP's channel; set a channel here to pin the scan to it (leave empty/auto for normal roaming)."))
+o.placeholder = "11"
+o.datatype = "uinteger"
+o.rmempty = true
+o:depends("role", "server")
+o:depends("role", "client")
+
 o = s:taboption("backhaul", Value, "ssid", translate("Backhaul SSID"),
 	translate("Must match on both ends"))
 o.default = "link"
@@ -71,14 +80,23 @@ o.datatype = "ip4addr"
 o.default = "172.16.9.1"
 o.rmempty = false
 
-o = s:taboption("backhaul", Value, "peer_ips", translate("Peer Backhaul IP (one or more)"),
-	translate("Space-separated peer underlay addresses, same subnet as local. One peer = one IP, " ..
-		"multiple peers = multiple IPs (e.g. 172.16.9.2 172.16.9.3 172.16.9.4). " ..
-		"Multi-peer is server-only: creates a dedicated VXLAN tunnel per peer bridged into br-lan/br-iptv/br-voip; " ..
+o = s:taboption("backhaul", Value, "peer_ips", translate("Server Backhaul IP"),
+	translate("Client-only: the server (AP) underlay address, same subnet as local. " ..
+		"e.g. local=172.16.9.2 -> server=172.16.9.1"))
+o.datatype = "ip4addr"
+o.placeholder = "172.16.9.1"
+o.rmempty = true
+o:depends("role", "client")
+
+o = s:taboption("backhaul", Value, "peer_ips_list", translate("Peer Backhaul IPs (one or more)"),
+	translate("Server-only: space-separated client underlay addresses, same subnet as local. " ..
+		"One peer = one IP, multiple peers = multiple IPs (e.g. 172.16.9.2 172.16.9.3 172.16.9.4). " ..
+		"Each peer gets a dedicated VXLAN tunnel bridged into br-lan/br-iptv/br-voip; " ..
 		"offline peers do not affect the server (tunnels are managed directly by the script, not netifd)."))
 o.placeholder = "172.16.9.2 172.16.9.3"
 o.datatype = "string"
-o.rmempty = false
+o.rmempty = true
+o:depends("role", "server")
 
 o = s:taboption("backhaul", Value, "backhaul_mask", translate("Backhaul Netmask"))
 o.datatype = "ip4addr"
@@ -166,10 +184,12 @@ o.default = "zte"
 o:depends("provider", "telecom")
 
 o = s:taboption("iptv", Value, "iptv_gateway", translate("Private Gateway"),
-	translate("Next-hop for private routes; leave empty to skip private routes"))
+	translate("Next-hop for private routes; leave empty to skip private routes. " ..
+		"Shanghai Telecom IPTV DHCP assigns EITHER 30.170.0.0/16 or 30.171.0.0/16 - " ..
+		"the gateway is auto-detected from the DHCP lease, this value is only a fallback"))
 o.datatype = "ip4addr"
 o.rmempty = true
-o.placeholder = "30.170.0.1"
+o.placeholder = "30.170.0.1 / 30.171.0.1"
 o:depends("provider", "telecom")
 
 o = s:taboption("iptv", Value, "iptv_routes", translate("IPTV Walled-Garden Routes"),
@@ -222,7 +242,7 @@ o = s:taboption("voip", Flag, "voip_enable", translate("Enable VoIP Network"),
 	translate("Shanghai Telecom VoIP uses VLAN46 private network. Dedicated vxlan_voip tunnel + br-voip bridge, " ..
 		"not shared with other tunnels. DHCP yields 28.132.57.x/17, gateway 28.132.127.254 (HSRP)."))
 o.default = "0"
-o.rmempty = false
+o.rmempty = true
 o:depends("provider", "telecom")
 
 o = s:taboption("voip", Value, "voip_vid", translate("VoIP VLAN ID"),
@@ -285,7 +305,7 @@ o.default = "0"
 o.rmempty = false
 
 o = s:taboption("advanced", ListValue, "switch_mode", translate("Switch Mode"),
-	translate("auto/software 8021q = default for all platforms; wireless mesh doesn't depend on board port layout (arm/x86 use pure software VLAN). " ..
+	translate("auto/software 8021q = default for all platforms (arm/x86 use pure software VLAN). " ..
 		"Multi-port boards may pick hw (hardware VLAN/swconfig) to use the switch chip"))
 o:value("auto", translate("Auto (software 8021q, recommended)"))
 o:value("hw", translate("Hardware VLAN (swconfig, multi-port boards)"))
